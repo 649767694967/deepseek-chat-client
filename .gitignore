@@ -1,0 +1,7 @@
+# 本地产物
+node_modules/
+*.log
+
+# 系统
+.DS_Store
+Thumbs.db
