@@ -1961,6 +1961,128 @@ html[data-device="phone"] .onboard-card {
 }
 html[data-device="phone"] .onboard-actions .btn { min-height: 46px; }
 html[data-device="phone"] .appearance-row .btn { min-height: 44px; }
+
+/* ================= 观感对齐 DeepSeek 手机端 ================= */
+:root {
+  --ds-user: #4d6bfe;
+  --ds-user-2: #3d5bf0;
+}
+html[data-theme="light"] { --ds-user: #4d6bfe; }
+
+/* 顶栏：标题居中、两侧图标对齐 App */
+#topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  height: 54px;
+  padding: 0 8px;
+}
+#topbar .brand {
+  text-align: center;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#topActions { display: flex; align-items: center; gap: 2px; justify-self: end; }
+
+/* 消息：用户蓝气泡靠右，AI 直接铺文字 */
+#messages { padding: 16px 14px 8px; }
+.msg { display: flex; gap: 8px; margin-bottom: 18px; align-items: flex-start; }
+.msg[data-role="user"] { flex-direction: row-reverse; }
+.msg .avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 14px; flex: none; margin-top: 2px;
+  background: var(--bg-elev); border: 1px solid var(--line);
+}
+.msg .bubble-wrap { max-width: 82%; }
+.msg[data-role="user"] .bubble-wrap { max-width: 80%; align-items: flex-end; }
+.msg .meta { display: flex; gap: 6px; align-items: baseline; margin: 0 2px 4px; font-size: 11px; color: var(--muted); }
+.msg[data-role="user"] .meta { justify-content: flex-end; }
+
+.msg .bubble {
+  border: none;
+  border-radius: 18px;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.75;
+  background: var(--bg-elev);
+}
+.msg[data-role="user"] .bubble {
+  background: var(--ds-user);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+.msg[data-role="assistant"] .bubble {
+  background: transparent;
+  padding: 2px 2px 0;
+  border-radius: 0;
+}
+.msg[data-role="assistant"] .bubble-wrap { max-width: 100%; }
+.msg[data-role="assistant"] .bubble .para { margin: 0 0 10px; }
+.msg[data-role="assistant"] .bubble .code-block { margin: 10px 0; }
+.msg[data-role="user"] .bubble .code-block { background: rgb(0 0 0 / .22); }
+.msg[data-role="user"] .bubble a { color: #dbe4ff; }
+
+.msg .think { margin: 0 0 6px; }
+.msg .think > summary {
+  font-size: 12.5px; color: var(--muted);
+  padding: 4px 8px; border-radius: 8px; background: var(--bg-elev);
+  display: inline-block; cursor: pointer; list-style: none;
+}
+.msg .think > summary::-webkit-details-marker { display: none; }
+.msg .think-body { font-size: 13px; color: var(--muted); line-height: 1.7; padding: 6px 2px 0; white-space: pre-wrap; }
+
+.msg-actions { opacity: 0; transition: opacity .15s; margin-top: 4px; }
+.msg:hover .msg-actions, .msg:focus-within .msg-actions { opacity: .75; }
+.msg[data-role="user"] .msg-actions { justify-content: flex-end; }
+
+/* 输入区：胶囊输入框 + 圆形发送键 */
+#composer { padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--bg); }
+.composer-box { border: 1px solid var(--line); border-radius: 24px; background: var(--bg-elev); padding: 6px 6px 6px 16px; }
+#input {
+  border: none; background: transparent; padding: 6px 0;
+  font-size: 15.5px; line-height: 1.6; max-height: 160px;
+}
+#input:focus { outline: none; }
+#composerBar { display: flex; align-items: center; gap: 8px; padding: 2px 2px 2px 0; }
+#tokenHint { font-size: 11px; color: var(--muted); }
+.bar-spacer { flex: 1 1 auto; }
+#sendBtn {
+  width: 40px; height: 40px; min-width: 40px; border-radius: 50%;
+  padding: 0; font-size: 0; background: var(--ds-user); border-color: var(--ds-user);
+  display: grid; place-items: center;
+}
+#sendBtn::after { content: "↑"; font-size: 19px; font-weight: 700; color: #fff; line-height: 1; }
+#sendBtn:disabled { opacity: .45; }
+#sendBtn:hover:not(:disabled) { background: var(--ds-user-2); }
+#stopBtn { border-radius: 999px; font-size: 12.5px; padding: 6px 12px; }
+#composerTools { display: flex; gap: 8px; align-items: center; padding: 0 2px 6px; }
+#modelSelect {
+  font-size: 12px; padding: 4px 8px; border-radius: 999px;
+  background: transparent; border: 1px solid var(--line); color: var(--muted);
+}
+#clearBtn { font-size: 11.5px; color: var(--muted); border: none; background: transparent; }
+
+/* 空状态更像 App 首屏 */
+.empty { padding: 15vh 18px 0; text-align: center; }
+.empty h2 { font-size: 19px; margin-bottom: 8px; }
+.empty p { font-size: 13.5px; color: var(--muted); line-height: 1.7; max-width: 320px; margin: 0 auto 18px; }
+.empty-key { border-radius: 999px; padding: 11px 20px; font-size: 14px; }
+.empty-tips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.empty-tips .chip { font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; }
+
+html[data-device="phone"] #topbar { height: 50px; }
+html[data-device="phone"] .msg .bubble-wrap { max-width: 86%; }
+html[data-device="phone"] .msg[data-role="user"] .bubble-wrap { max-width: 82%; }
+html[data-device="phone"] .msg .bubble { font-size: 15px; padding: 9px 13px; }
+html[data-device="phone"] .msg[data-role="assistant"] .bubble { padding: 0 2px; }
+html[data-device="phone"] #messages { padding: 12px 12px 6px; }
+html[data-device="phone"] #input { font-size: 16px; }
+html[data-device="phone"] #sendBtn { width: 42px; height: 42px; }
 </style>
 </head>
 
@@ -1970,12 +2092,12 @@ html[data-device="phone"] .appearance-row .btn { min-height: 44px; }
   <!-- ================= 顶栏 ================= -->
   <header id="topbar">
     <button id="menuBtn" class="icon-btn" type="button" title="会话列表" aria-label="打开会话列表">☰</button>
-    <div class="brand">DeepSeek 对话</div>
+    <div class="brand">DeepSeek</div>
     <div id="topActions">
       <span id="connDot" title="连接状态" aria-label="连接状态"><i class="dot" data-state="off"></i></span>
-      <button id="settingsBtn" class="icon-btn" type="button" title="设置" aria-label="打开设置">⚙</button>
+      <button id="newChatTopBtn" class="icon-btn" type="button" title="新建对话" aria-label="新建对话">＋</button>
+      <button id="settingsBtn" class="icon-btn" type="button" title="设置" aria-label="打开设置">⋯</button>
     </div>
-    <a id="convLink" class="top-conv" href="index.html" title="打开 DeepSeek 记录转换器">转换器</a>
   </header>
 
   <div class="layout">
@@ -2007,7 +2129,7 @@ html[data-device="phone"] .appearance-row .btn { min-height: 44px; }
 
       <div class="drawer-foot">
         <p>数据只存在这台设备的浏览器里（localStorage），API Key 是明文，公用电脑注意。</p>
-        <a class="drawer-conv" href="index.html">转换器 · 导入 DeepSeek 记录</a>
+        <a class="drawer-conv" href="https://649767694967.github.io/deepseek-chat-importer/" target="_blank" rel="noreferrer">转换器 · 导入 DeepSeek 记录</a>
         <div class="foot-meta"><span>单文件 · 离线可用</span><span>·</span><span>API 自填</span></div>
       </div>
     </aside>

@@ -97,7 +97,14 @@ function loadAll() {
     .map((i) => store.get('session.' + i.id, null))
     .filter(Boolean)
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-  if (!state.sessions.length) createSession(false);
+  if (!state.sessions.length) {
+    createSession(false);
+  } else {
+    // 记住上次打开的会话；没有就取最近一条（否则刷新后会显示成空对话）
+    const remembered = store.get('currentSession', null);
+    const hit = remembered && state.sessions.some((x) => x.id === remembered) ? remembered : state.sessions[0].id;
+    state.currentId = hit;
+  }
 }
 
 function createSession(render = true) {
@@ -110,6 +117,7 @@ function createSession(render = true) {
   };
   state.sessions.unshift(s);
   state.currentId = s.id;
+  store.set('currentSession', s.id);
   persistSession(s);
   if (render) {
     renderSessions();
@@ -120,6 +128,7 @@ function createSession(render = true) {
 
 function switchSession(id) {
   state.currentId = id;
+  store.set('currentSession', id);
   renderSessions();
   renderMessages();
   closeDrawer();
@@ -999,6 +1008,10 @@ function scheduleDevice() {
 
 function bindEvents() {
   $('menuBtn')?.addEventListener('click', openDrawer);
+  $('newChatTopBtn')?.addEventListener('click', () => {
+    createSession();
+    $('input')?.focus();
+  });
   $('drawerClose')?.addEventListener('click', closeDrawer);
   $('scrim')?.addEventListener('click', closeDrawer);
 
