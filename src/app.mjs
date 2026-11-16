@@ -683,6 +683,14 @@ function fillSettingsForm() {
   $('testConnOut').textContent = '';
 }
 
+/** 推荐参数：温度 0.7（写作/日常）、max tokens 留空用模型默认 */
+function applyRecommendedParams() {
+  $('temperature').value = '0.7';
+  $('maxTokens').value = '';
+  $('modelName').value = 'deepseek-chat';
+  $('modelPreset').value = 'deepseek-chat';
+  toast('已填入推荐值：temperature 0.7、max tokens 留空（模型默认）、deepseek-chat');
+}
 function saveSettingsFromForm() {
   const s = state.settings;
   s.apiBase = ccNormalizeBase($('apiBase').value);
@@ -1093,8 +1101,14 @@ function bindEvents() {
   $('settingsBtn')?.addEventListener('click', openSettings);
   document.querySelectorAll('[data-open-settings]').forEach((b) => b.addEventListener('click', openSettings));
   $('closeSettingsBtn')?.addEventListener('click', () => closeDlg('settingsDlg'));
+  $('supportBtn')?.addEventListener('click', () => {
+    const dlg = $('supportDlg');
+    if (dlg && !dlg.open) dlg.showModal();
+  });
+  $('supportOkBtn')?.addEventListener('click', () => closeDlg('supportDlg'));
   $('saveSettingsBtn')?.addEventListener('click', saveSettingsFromForm);
   $('testConnBtn')?.addEventListener('click', testConnection);
+  $('recommendBtn')?.addEventListener('click', applyRecommendedParams);
   $('modelPreset')?.addEventListener('change', (e) => {
     const p = CC_MODEL_PRESETS.find((x) => x.id === e.target.value);
     if (p && p.model) $('modelName').value = p.model;
@@ -1271,6 +1285,10 @@ function maybeOnboard() {
     if (body && !body.childElementCount) body.innerHTML = HELP_HTML;
     openDlg('helpDlg');
   });
+  $('onboardImportBtn')?.addEventListener('click', () => {
+    finishOnboard();
+    openDlg('importDlg');
+  });
   done?.addEventListener('click', () => {
     finishOnboard();
     if (!state.settings.apiKey) {
@@ -1280,6 +1298,30 @@ function maybeOnboard() {
   });
 }
 
+/* ---------------- 支持作者（第二次进入弹一次） ---------------- */
+
+const VISIT_KEY = 'visits';
+const SUPPORT_KEY = 'supportSeen';
+
+function markVisit() {
+  const n = Number(store.get(VISIT_KEY, 0)) || 0;
+  const next = n + 1;
+  store.set(VISIT_KEY, next);
+  return next;
+}
+
+function maybeSupport() {
+  if (!store.get(ONBOARD_KEY, false)) return; // 引导还没看完就不打扰
+  if (store.get(SUPPORT_KEY, false)) return;
+  const visits = Number(store.get(VISIT_KEY, 0)) || 0;
+  if (visits < 2) return; // 第一次进来是新手引导，第二次才提
+  const dlg = $('supportDlg');
+  if (!dlg) return;
+  store.set(SUPPORT_KEY, true);
+  setTimeout(() => {
+    if (!dlg.open && !document.querySelector('dialog[open]')) dlg.showModal();
+  }, 900);
+}
 /** 转换器「发送到聊天客户端」写进 localStorage 的待导入会话 */
 async function importPendingFromConverter() {
   const raw = store.get('pendingImport', null);
@@ -1315,7 +1357,13 @@ function boot() {
   renderSessions();
   renderMessages();
   bindEvents();
+  markVisit();
+  // 设置里的小二维码复用弹窗那张，避免同一张图内联两次
+  const qrBig = $('supportQr');
+  const qrSmall = $('supportQrSmall');
+  if (qrBig && qrSmall && qrBig.src) qrSmall.src = qrBig.src;
   maybeOnboard();
+  maybeSupport();
   const wantImport = /[?&]import=pending\b/.test(location.search);
   if (wantImport || store.get('pendingImport', null)) {
     importPendingFromConverter().then((ok) => {
